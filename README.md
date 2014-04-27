@@ -19,7 +19,7 @@ cpan install Pod::Usage
 How-to config
 ===========================
 
-/var/CommuniGate/Settings/Rules.settings
+/var/CommuniGate/Settings/Main.settings
 
 ExternalFilters = ({Enabled=YES;LogLevel=5;Name=SIGN;ProgramName="/usr/bin/perl /var/CommuniGate/sign.pl";RestartPause=5s;Timeout=10m;});
 
