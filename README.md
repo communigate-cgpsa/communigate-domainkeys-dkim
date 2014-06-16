@@ -31,7 +31,7 @@ ExternalFilters = ({Enabled=YES;LogLevel=5;Name=SIGN;ProgramName="/usr/bin/perl 
     "SIGN DKIM",
     (
       (Source, in, "trusted,authenticated"),
-      ("Header Field", "is not", "Dkim-Signature:*"),
+      ("Header Field", "is not", "Dkim-Signature:**"),
       ("Any Route", is, "SMTP**")
     ),
     ((ExternalFilter, SIGN), ("Stop Processing"))
