@@ -48,12 +48,11 @@ sub Log {
 }
 $| = 1;
 Log "DKIM is running";Log "";
-mkdir "Submitted" if ( !-d "Submitted" );
 while (<>) {
 	my @line = split( / /, $_ );
 	chomp( $line[0] );
 	print "$line[0] OK\n"     and next if ( $line[1] =~ /^quit$/i );
-	print "$line[0] INTF 3\n" and next if ( $line[1] =~ /^intf$/i );
+	print "$line[0] INTF 4\n" and next if ( $line[1] =~ /^intf$/i );
 	print "$line[0] OK\n"     and next if ( $line[1] =~ /^key$/i );
 	print "$line[0] FAILURE\n" and next if ( $line[1] !~ /^file$/i );    
 	$line[2] =~ s|\\|/|g;              
@@ -102,14 +101,19 @@ while (<>) {
 			my $signature_dk=($dkim->signatures())[1]->as_string;
 			$signature_dk=~s/\r\n/\n/g;
 									
-			my $alertFileName.="Submitted/A".time().int(rand(10000));
-			open(SUBM,">$alertFileName.tmp");
-			print SUBM "$signature_dk\n";
-			print SUBM "$signature_dkim\n";
-			print SUBM $EntireMessage;
-			close SUBM;
-			rename("$alertFileName.tmp","$alertFileName.sub");
-			print "$line[0] DISCARD\n";
+			# Add signatures to the original queue message, preserving its envelope.
+			my $headers = "$signature_dk\n$signature_dkim";
+			$headers =~ s/\n+$//;
+			$headers =~ s/\\/\\\\/g;
+			$headers =~ s/"/\\"/g;
+			$headers =~ s/\t/\\t/g;
+			$headers =~ s/\n/\\e/g;
+			my $response = "$line[0] ADDHEADER \"$headers\" OK\n";
+			if (length($response) > 4095) {
+				print "$line[0] REJECTED \"DKIM response exceeds helper limit\"\n";
+			} else {
+				print $response;
+			}
 		}
 		else {
 			Log "DKIM skip file: $line[2]";	print "$line[0] OK\n";
