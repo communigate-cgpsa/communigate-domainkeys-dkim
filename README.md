@@ -3,6 +3,23 @@ communigate-domainkeys-dkim
 
 DKIM/DomainKeys signer for CommuniGate CGP free (implemented as a Content-Filtering script)
 
+Requires External Filter protocol version 4 or later. The signer adds its
+signature headers to the original queued message with `ADDHEADER`, preserving
+the SMTP envelope, including BCC recipients. It does not resubmit the message
+through `Submitted`. Signature headers are escaped using CommuniGate's String
+format, and oversized helper responses postpone processing with `REJECTED`.
+
+Protocol regression tests (Python 3 and Perl; no CPAN modules, keys or network
+required):
+
+```
+python3 tests/test_protocol.py -v
+```
+
+Set `PERL` to select a Perl executable. These tests stub only the signing library
+and check envelope preservation, BCC privacy, response escaping, already-signed
+messages and oversized responses. They do not validate cryptographic signing.
+
 External library
 ===========================
 
